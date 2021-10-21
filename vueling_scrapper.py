@@ -6,12 +6,11 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-# from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-# from webdriver_manager.chrome import ChromeDriverManager
 
-DEPLOYED = False
+DEPLOYED = True
 LAST_SLIDES = 0
 VUELING_URL = "https://www.vueling.com/es"
 
@@ -45,12 +44,12 @@ class VuelingScrapper:
 
     def get_chrome_driver(self):
         chrome_options = self.get_chrome_options()
-        # service = Service(ChromeDriverManager().install())
         if DEPLOYED:
             driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         elif not DEPLOYED:
-            # driver = webdriver.Chrome(service=service)
-            pass
+            from webdriver_manager.chrome import ChromeDriverManager
+            service = Service(ChromeDriverManager().install())
+            driver = webdriver.Chrome(service=service)
         driver.get(VUELING_URL)
         return driver
 
@@ -58,7 +57,6 @@ class VuelingScrapper:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
         chrome_options.add_argument("--headless")
-        # chrome_options.add_argument("--disable-dev-shm-usage")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--remote-debugging-port=9222")
         chrome_options.add_argument("--disable-gpu")
