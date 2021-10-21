@@ -6,10 +6,10 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.service import Service
+# from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
-from webdriver_manager.chrome import ChromeDriverManager
+# from webdriver_manager.chrome import ChromeDriverManager
 
 DEPLOYED = False
 LAST_SLIDES = 0
@@ -45,11 +45,12 @@ class VuelingScrapper:
 
     def get_chrome_driver(self):
         chrome_options = self.get_chrome_options()
-        service = Service(ChromeDriverManager().install())
+        # service = Service(ChromeDriverManager().install())
         if DEPLOYED:
             driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
         elif not DEPLOYED:
-            driver = webdriver.Chrome(service=service)
+            # driver = webdriver.Chrome(service=service)
+            pass
         driver.get(VUELING_URL)
         return driver
 
