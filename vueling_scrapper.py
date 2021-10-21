@@ -1,16 +1,17 @@
 import email.message
 import getpass
-import time
+import os
 import smtplib
+import time
 
 from selenium import webdriver
-from selenium.webdriver.chrome import service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from webdriver_manager.chrome import ChromeDriverManager
 
+DEPLOYED = False
 LAST_SLIDES = 0
 VUELING_URL = "https://www.vueling.com/es"
 
@@ -43,10 +44,22 @@ class VuelingScrapper:
         return emails
 
     def get_chrome_driver(self):
+        chrome_options = self.get_chrome_options()
         service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service)
+        if DEPLOYED:
+            driver = webdriver.Chrome(service=service, chrome_options=chrome_options)
+        elif not DEPLOYED:
+            driver = webdriver.Chrome(service=service)
         driver.get(VUELING_URL)
         return driver
+
+    def get_chrome_options(self):
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--no-sandbox")
+        return chrome_options
 
     def allow_cookies(self, driver):
         wait = WebDriverWait(driver, 15)
