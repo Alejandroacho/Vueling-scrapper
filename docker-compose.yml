@@ -1,0 +1,43 @@
+version: '3.7'
+
+services:
+  hub:
+    image: selenium/hub
+    ports:
+      - "4444:4444"
+  
+  chrome:
+    image: selenium/node-chrome
+    depends_on:
+      - hub
+    environment:
+      - SE_EVENT_BUS_HOST=hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    volumes:
+      - /dev/shm:/dev/shm
+    links:
+      - hub
+
+
+
+# version: '3'
+
+# services:
+#   selenium:
+#     image: selenium/standalone-chrome:4.0.0
+#     ports:
+#       - "4444:4444"
+#     restart: always
+  
+#   app:
+#     stdin_open: true
+#     tty: true
+#     build:
+#       context: .
+#     volumes:
+#       - ./app:/app
+#     command: python3 vueling_scrapper.py
+#     depends_on:
+#       - selenium
+
