@@ -7,6 +7,7 @@ import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
@@ -31,8 +32,14 @@ class VuelingScrapper:
     def get_email_sender_and_server(self):
         while True:
             try:
-                sender = input("Email sender: ")
-                password = getpass.getpass()
+                if not os.environ.get('EMAIL_SENDER'):
+                    sender = input("Email sender: ")
+                else:
+                    sender = os.environ.get('EMAIL_SENDER')
+                if not os.environ.get('SENDER_PASSWORD'):
+                    password = getpass.getpass()
+                else:
+                    password = os.environ.get('SENDER_PASSWORD')
                 server = smtplib.SMTP('smtp.gmail.com', 587)
                 server.starttls()
                 server.login(sender, password)
@@ -45,39 +52,38 @@ class VuelingScrapper:
     def get_emails(self):
         while True:
             try:
-                number_of_emails = int(input("Number of emails: "))
+                if not os.environ.get('EMAILS'):
+                    number_of_emails = int(input("Number of emails: "))
+                else:
+                    number_of_emails = int(os.environ.get('EMAILS'))
                 break
             except:
                 print("Please insert a valid number")
         emails = []
         for number in range(number_of_emails):
-            email = input(f"Email {number + 1}: ")
-            emails.append(email)
+            if not os.environ.get('EMAIL_' + str(number + 1)):
+                email = input(f"Email {number + 1}: ")
+                emails.append(email)
+            else:
+                emails.append(os.environ.get('EMAIL_' + str(number + 1)))
         return emails
 
     def get_chrome_driver(self):
-        # Service method (current one)
-        # service = Service(ChromeDriverManager().install())
-        # driver = webdriver.Chrome(service=service)
-        
-        # Driver method (deprecated)
-        # driver = webdriver.Chrome('path')
-
-        # Remote method
         options = self.get_chrome_options()
-        driver = webdriver.Remote('http://selenium:4444/wd/hub', 
+        driver = webdriver.Remote(command_executor='http://hub:4444/wd/hub', 
+                                  desired_capabilities=DesiredCapabilities.CHROME,
                                   options=options)
-
         driver.get(VUELING_URL)
         return driver
 
     def get_chrome_options(self):
-        chrome_options = webdriver.ChromeOptions()
-        #chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-        chrome_options.add_argument("--headless")
+        chrome_options = Options()
         chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument('--disable-dev-shm-usage')
+        # chrome_options = webdriver.ChromeOptions()
+        # chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--no-sandbox")
+        # chrome_options.add_argument("--disable-gpu")
+        # chrome_options.add_argument('--disable-dev-shm-usage')
         return chrome_options
 
     def allow_cookies(self, driver):
@@ -108,4 +114,5 @@ class VuelingScrapper:
         message.set_payload("Maybe there is a slide with an offer! :D")
         return message.as_string()
 
+time.sleep(30)
 VuelingScrapper()

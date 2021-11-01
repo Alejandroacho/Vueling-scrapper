@@ -20,25 +20,15 @@ services:
     links:
       - hub
 
-
-
-# version: '3'
-
-# services:
-#   selenium:
-#     image: selenium/standalone-chrome:4.0.0
-#     ports:
-#       - "4444:4444"
-#     restart: always
-  
-#   app:
-#     stdin_open: true
-#     tty: true
-#     build:
-#       context: .
-#     volumes:
-#       - ./app:/app
-#     command: python3 vueling_scrapper.py
-#     depends_on:
-#       - selenium
-
+  app:
+    stdin_open: true
+    tty: true
+    build:
+      context: .
+    volumes:
+      - ./app:/app
+    command: python3 vueling_scrapper.py
+    depends_on:
+      - chrome
+    env_file:
+      - .env
